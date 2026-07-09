@@ -1,0 +1,77 @@
+---
+import { Icon } from "astro-icon/components";
+import { type Project, statusLabel } from "@/data/projects";
+
+interface Props {
+	project: Project;
+	/** Compact form for the home page: no stack list, no result detail. */
+	compact?: boolean;
+}
+
+const { compact = false, project } = Astro.props;
+const { hook, repo, result, slug, stack, status, tagline, title } = project;
+
+const statusClass: Record<Project["status"], string> = {
+	shipped: "border-accent text-accent",
+	training: "border-link text-link",
+	design: "border-muted text-muted",
+};
+---
+
+<article class="border-muted/30 border-t pt-6" id={slug}>
+	<div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+		<h3 class="text-accent-2 text-lg font-semibold">{title}</h3>
+		<span
+			class:list={["rounded-full border px-2 py-0.5 text-xs font-semibold", statusClass[status]]}
+		>
+			{statusLabel[status]}
+		</span>
+	</div>
+
+	<p class="mt-2">{tagline}</p>
+
+	{
+		result ? (
+			<p class="border-accent mt-4 border-s-2 ps-3">
+				<strong class="text-accent-2">{result.headline}</strong>
+				{!compact && <span class="text-muted block sm:inline"> — {result.detail}</span>}
+			</p>
+		) : (
+			<p class="text-muted mt-4 text-xs italic">
+				No published result yet. Numbers appear here when a run produces them.
+			</p>
+		)
+	}
+
+	{
+		!compact && (
+			<>
+				<p class="mt-4">
+					<span class="text-accent-2 font-semibold">The hard part: </span>
+					{hook}
+				</p>
+				<ul class="text-muted mt-4 flex flex-wrap gap-x-2 gap-y-1 text-xs" role="list">
+					{stack.map((tech) => (
+						<li class="bg-muted/10 rounded px-2 py-0.5">{tech}</li>
+					))}
+				</ul>
+			</>
+		)
+	}
+
+	{
+		repo ? (
+			<a
+				class="cactus-link mt-4 inline-flex items-center gap-x-1 text-sm"
+				href={repo}
+				rel="noreferrer"
+				target="_blank"
+			>
+				<Icon aria-hidden="true" class="h-4 w-4" focusable="false" name="mdi:github" />
+				View the code
+			</a>
+		) : (
+			<p class="text-muted mt-4 text-xs">Repository not yet public.</p>
+		)
+	}
+</article>

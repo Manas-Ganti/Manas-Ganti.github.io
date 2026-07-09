@@ -1,0 +1,95 @@
+---
+import { Image } from "astro:assets";
+import { render } from "astro:content";
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import { Icon } from "astro-icon/components";
+import { getAllResearch, statusClass, statusLabel } from "@/data/research";
+import PageLayout from "@/layouts/Base.astro";
+import { siteConfig } from "@/site.config";
+
+export const getStaticPaths = (async () => {
+	const entries = await getAllResearch();
+	return entries.map((entry) => ({
+		params: { slug: entry.id },
+		props: { entry },
+	}));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { entry } = Astro.props;
+const { arxiv, authors, code, figure, finding, status, title, venue } = entry.data;
+const { Content } = await render(entry);
+
+const meta = { description: finding, title };
+---
+
+<PageLayout meta={meta}>
+	<a class="cactus-link text-muted mb-6 inline-flex items-center gap-x-1 text-sm" href="/research/">
+		<Icon aria-hidden="true" class="h-4 w-4" focusable="false" name="mdi:arrow-left" />
+		Research
+	</a>
+
+	<h1 class="title mb-4">{title}</h1>
+
+	<span
+		class:list={[
+			"inline-block rounded-full border px-2 py-0.5 text-xs font-semibold",
+			statusClass[status],
+		]}
+	>
+		{statusLabel({ status, venue })}
+	</span>
+
+	<p class="text-muted mt-3 text-xs">
+		{
+			authors.map((author, i) => (
+				<>
+					{i > 0 && ", "}
+					{author === siteConfig.author ? <strong class="text-accent-2">{author}</strong> : author}
+				</>
+			))
+		}
+	</p>
+
+	<p class="border-accent mt-6 border-s-2 ps-3"><strong class="text-accent-2">{finding}</strong></p>
+
+	{/* The code link does as much work as the paper link. Both stay above the fold. */}
+	<div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+		{
+			arxiv ? (
+				<a class="cactus-link inline-flex items-center gap-x-1" href={arxiv} rel="noreferrer" target="_blank">
+					<Icon aria-hidden="true" class="h-4 w-4" focusable="false" name="mdi:file-document-outline" />
+					Read the paper
+				</a>
+			) : (
+				<span class="text-muted text-xs">Preprint not yet posted.</span>
+			)
+		}
+		{
+			code ? (
+				<a class="cactus-link inline-flex items-center gap-x-1" href={code} rel="noreferrer" target="_blank">
+					<Icon aria-hidden="true" class="h-4 w-4" focusable="false" name="mdi:github" />
+					View the code
+				</a>
+			) : (
+				<span class="text-muted text-xs">Repository not yet public.</span>
+			)
+		}
+	</div>
+
+	{
+		figure && (
+			<figure class="mt-10">
+				<Image alt={figure.alt} class="w-full rounded" src={figure.src} />
+				{figure.caption && (
+					<figcaption class="text-muted mt-2 text-xs">{figure.caption}</figcaption>
+				)}
+			</figure>
+		)
+	}
+
+	<div class="prose prose-sm prose-cactus mt-10 max-w-none">
+		<Content />
+	</div>
+</PageLayout>

@@ -38,16 +38,6 @@ const post = defineCollection({
 		}),
 });
 
-const note = defineCollection({
-	loader: glob({ base: "./content/notes", pattern: "**/*.{md,mdx}" }),
-	schema: baseSchema.extend({
-		description: z.string().optional(),
-		publishDate: z.iso
-			.datetime({ offset: true }) // Ensures ISO 8601 format with offsets allowed (e.g. "2024-01-01T00:00:00Z" and "2024-01-01T00:00:00+02:00")
-			.transform((val) => new Date(val)),
-	}),
-});
-
 const tag = defineCollection({
 	loader: glob({ base: "./content/tags", pattern: "**/*.{md,mdx}" }),
 	schema: z.object({
@@ -56,4 +46,52 @@ const tag = defineCollection({
 	}),
 });
 
-export const collections = { post, note, tag };
+/**
+ * Ordered weakest to strongest. A paper only ever moves down this list, and only
+ * when the move has already happened in the real world.
+ */
+const researchStatusSchema = z.enum(["in-preparation", "preprint", "under-review", "accepted"]);
+
+const research = defineCollection({
+	loader: glob({ base: "./content/research", pattern: "**/*.{md,mdx}" }),
+	schema: ({ image }) =>
+		baseSchema
+			.extend({
+				/** The finding, in one sentence a non-specialist understands. Not the method. */
+				finding: z.string(),
+				status: researchStatusSchema,
+				/** e.g. "NeurIPS 2026". Required once a venue is claimed — see superRefine below. */
+				venue: z.string().optional(),
+				/** Full author list, in publication order. The name matching siteConfig.author is emphasised. */
+				authors: z.array(z.string()).nonempty(),
+				arxiv: z.url().optional(),
+				code: z.url().optional(),
+				figure: z
+					.object({
+						alt: z.string(),
+						caption: z.string().optional(),
+						src: image(),
+					})
+					.optional(),
+				/** Lower sorts first on the index. */
+				order: z.number().default(0),
+				draft: z.boolean().default(false),
+			})
+			.superRefine((entry, ctx) => {
+				const require = (field: "venue" | "arxiv", message: string) => {
+					if (!entry[field]) ctx.addIssue({ code: "custom", message, path: [field] });
+				};
+				// Never imply acceptance, review, or a preprint that does not exist.
+				if (entry.status === "accepted") {
+					require("venue", "status 'accepted' requires the venue that accepted it.");
+				}
+				if (entry.status === "under-review") {
+					require("venue", "status 'under-review' requires the venue reviewing it.");
+				}
+				if (entry.status === "preprint") {
+					require("arxiv", "status 'preprint' requires the arXiv URL.");
+				}
+			}),
+});
+
+export const collections = { post, research, tag };

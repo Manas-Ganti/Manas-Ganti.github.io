@@ -1,0 +1,29 @@
+---
+import ProjectCard from "@/components/ProjectCard.astro";
+import { projects } from "@/data/projects";
+import PageLayout from "@/layouts/Base.astro";
+
+const meta = {
+	description:
+		"Reinforcement learning and production ML projects — each with its design decision, its status, and its code.",
+	title: "Projects",
+};
+---
+
+<PageLayout meta={meta}>
+	<h1 class="title mb-6">Projects</h1>
+
+	<p class="mb-4">
+		Four projects, at different stages. Where a number exists, it was measured and you can go check
+		it. Where a project hasn't finished training, it says so and shows no number — a result I haven't
+		run isn't a result.
+	</p>
+	<p class="text-muted mb-12 text-xs">
+		What I think is worth reading in each one is the design decision, not the tech stack. Those are
+		under <span class="text-accent-2 font-semibold">The hard part</span>.
+	</p>
+
+	<div class="space-y-12">
+		{projects.map((project) => <ProjectCard project={project} />)}
+	</div>
+</PageLayout>

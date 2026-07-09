@@ -1,0 +1,42 @@
+---
+import ResearchCard from "@/components/ResearchCard.astro";
+import { getAllResearch } from "@/data/research";
+import PageLayout from "@/layouts/Base.astro";
+
+const meta = {
+	description:
+		"Reinforcement learning research — paper, code, and the plain-English version of what it found.",
+	title: "Research",
+};
+
+const entries = await getAllResearch();
+---
+
+<PageLayout meta={meta}>
+	<h1 class="title mb-6">Research</h1>
+
+	<p class="mb-4">
+		This is a set of Research problems/experiments I'm currently working on. Each entry opens onto
+		its own write-up: the problem, the idea, the result, and what it means. This page will focus on
+		what I feel and think about these experiments in a more informal manner. The paper and the code
+		sit together at the top of every one of them and they will take you to the actual paper.
+	</p>
+	<p class="text-muted mb-12 text-xs">
+		The status line on each entry says exactly where the work stands. Nothing is listed as accepted
+		until it has been accepted.
+	</p>
+
+	{
+		entries.length > 0 ? (
+			<div class="space-y-12">
+				{entries.map((entry) => (
+					<ResearchCard entry={entry} />
+				))}
+			</div>
+		) : (
+			<p class="text-muted italic">
+				Nothing published here yet. Entries appear once there is a paper to point at.
+			</p>
+		)
+	}
+</PageLayout>

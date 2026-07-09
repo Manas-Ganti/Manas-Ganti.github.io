@@ -1,8 +1,10 @@
 ---
+import SocialList from "@/components/SocialList.astro";
 import PageLayout from "@/layouts/Base.astro";
 
 const meta = {
-	description: "I'm a starter theme for Astro.build",
+	description:
+		"Manas Ganti — research engineer working on reinforcement learning, post-training, and production ML systems.",
 	title: "About",
 };
 ---
@@ -11,26 +13,43 @@ const meta = {
 	<h1 class="title mb-12">About</h1>
 	<div class="prose prose-sm prose-cactus max-w-none">
 		<p>
-			Hi, I’m a starter Astro. I’m particularly great for getting you started with your own blogging
-			website.
+			I'm Manas Ganti, a machine learning engineer who builds computer vision and deep learning
+			systems that hold up in the real world on factory floors, edge devices, and clinical imaging
+			pipelines.
 		</p>
-		<p>Here are my some of my awesome built in features:</p>
-		<ul class="list-inside list-disc" role="list">
-			<li>I'm ultra fast as I'm a static site</li>
-			<li>I'm fully responsive</li>
-			<li>I come with a light and dark mode</li>
-			<li>I'm easy to customise and add additional content</li>
-			<li>I have Tailwind CSS styling</li>
-			<li>Shiki code syntax highlighting</li>
-			<li>Satori for auto generating OG images for blog posts</li>
-		</ul>
+
 		<p>
-			Clone or fork my <a
-				class="cactus-link inline-block"
-				href="https://github.com/chrismwilliams/astro-cactus"
-				rel="noreferrer"
-				target="_blank">repo</a
-			> if you like me!
+			Over the past three years I've taken models the full distance from training to production. At
+			Assert AI, I built real-time computer vision pipelines on NVIDIA Jetson hardware for
+			industrial safety pose estimation, PPE compliance, and automatic number-plate recognition
+			running under tight latency and memory constraints across multi-camera deployments. Before
+			that, at Inmed Prognostics, I developed segmentation and detection models for brain CT and MRI
+			modalities, and managed engineering teams to ship them into production medical imaging
+			systems.
 		</p>
+
+		<p>
+			More recently my work has moved toward the multimodal and generative frontier: fine-tuning
+			vision-language models, building RAG pipelines, and evaluating LLMs on real tasks. I'm
+			currently pursuing an M.S. in Computer Engineering at Virginia Tech, focused on advanced
+			machine learning, computer vision, and reinforcement learning.
+		</p>
+
+		<p>
+			I'm deliberately pivoting toward reinforcement learning; specifically the design of RL
+			environments and verifiable reward systems for training capable models. It's where my instinct
+			for real-world constraints and my interest in how models actually learn come together, and
+			it's the direction I'm building toward through my current projects and coursework.
+		</p>
+
+		<h2>Resume</h2>
+		<p>
+			<a class="cactus-link" href="/Manas-Ganti-Resume.pdf" rel="noreferrer" target="_blank">
+				Résumé (PDF)
+			</a>
+		</p>
+	</div>
+	<div class="mt-8">
+		<SocialList />
 	</div>
 </PageLayout>
