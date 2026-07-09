@@ -7,8 +7,8 @@ the stock theme into Manas Ganti's portfolio + blog. Strategy and page structure
 
 ## Commands
 
-`pnpm` is not on this machine despite `pnpm-lock.yaml` being present; use `npm`, or enable
-pnpm with `corepack enable`. `.nvmrc` pins Node 22 (system Node is 24; both work).
+This project uses **npm** — `package-lock.json` is the only lockfile, and CI and the Pages
+deploy both run `npm ci`. `.nvmrc` pins Node 22 (system Node is 24; both work).
 
 | Command | Action |
 |---|---|
@@ -61,8 +61,9 @@ Blocking:
 - **`/research` is an empty container.** Manas writes this himself. Never draft the
   paper's abstract, claims, or venue status for him.
 - **The home page's Research card is a placeholder.** Same rule.
-- `src/site.config.ts` — `url` is a guess (`https://manasganti.dev/`). It feeds
-  `astro.config.ts`, the sitemap, RSS, and canonical/OG URLs. Set the real domain.
+- `src/site.config.ts` — `url` is `https://manas-ganti.github.io/`, the GitHub Pages user
+  site, served at the domain root. If a custom domain is ever attached, change `url` here
+  (it feeds `astro.config.ts`, the sitemap, RSS, and canonical/OG URLs) and add a `CNAME`.
 - `src/components/SocialList.astro` — the LinkedIn URL is a guess; confirm the vanity slug.
 - `public/icon.svg` and `public/social-card.png` are still the Cactus theme's branding.
 
