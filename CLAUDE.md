@@ -3,7 +3,12 @@
 Astro Cactus template (Astro 7, Tailwind v4, TypeScript, Biome). Being converted from
 the stock theme into Manas Ganti's portfolio + blog. Strategy and page structure live in
 `../../markdown/WEBSITE_BLOG_PLAN.md`; the write-permission and proof rules live in
-`../../markdown/CLAUDE.md`.
+`../../CLAUDE.md`.
+
+**Before touching `src/data/projects.ts` or `/projects`, read [`SITE_UPDATE_BRIEF.md`](SITE_UPDATE_BRIEF.md)**
+— an audit of every project directory as of 2026-09-04, with verified numbers and their sources.
+`projects.ts` was re-synced against the project directories on 2026-09-23 (7 projects after self-play-highwayenv was removed, grouped by
+`area`); each `result` carries a comment naming the file its number came from.
 
 ## Commands
 
@@ -65,7 +70,9 @@ Blocking:
   site, served at the domain root. If a custom domain is ever attached, change `url` here
   (it feeds `astro.config.ts`, the sitemap, RSS, and canonical/OG URLs) and add a `CNAME`.
 - `src/components/SocialList.astro` — the LinkedIn URL is a guess; confirm the vanity slug.
-- `public/icon.svg` and `public/social-card.png` are still the Cactus theme's branding.
+- `public/icon.svg` is still the Cactus theme's cactus logo (favicon + webmanifest icon
+  source). The default share card is now `public/og-default.png` — regenerate it with
+  Satori if the title or tagline changes.
 
 Not blocking:
 

@@ -7,14 +7,22 @@ import PageLayout from "@/layouts/Base.astro";
 	<section>
 		<h1 class="title mb-6">Manas Ganti</h1>
 		<p class="mb-4">
-			I'm an aspiring research engineer who ships. I spent two years putting computer-vision models
-			into production; on Jetson boards, and in clinical imaging pipelines. Currently a grad student
-			in Computer Engineering at Virginia Tech.
+			I'm a research engineer working on <strong>RL environments and post-training</strong> for
+			language and vision-language models. I build environments where the reward is mechanically
+			verifiable, then train models against them with SFT and GRPO on multi-GPU clusters, at scales
+			from 7B to 32B.
 		</p>
 		<p class="mb-4">
-			Most of what I care about sits between these sections: Classic segmentation problems involving
-			Unets, Visual Language models and their intersection with modern Reinforcement Learning and
-			the applications of Reinforcement Learning.
+			Most of the work is in measuring things before trusting them. That means leak-checking
+			benchmarks until surface features score at chance, computing an optimal ceiling that tells me
+			when a policy is cheating, and gating every expensive run behind a cheap check. When a training
+			run doesn't move the metric, I write down why. Several of my
+			<a class="cactus-link" href="/projects/">projects</a> are exactly that.
+		</p>
+		<p class="mb-4">
+			Before this, I spent years shipping computer-vision models to production, on Jetson edge
+			devices and in clinical imaging pipelines. I'm currently a grad student in Computer
+			Engineering at Virginia Tech.
 		</p>
 		<SocialList />
 	</section>
