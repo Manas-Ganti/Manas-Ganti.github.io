@@ -23,7 +23,7 @@ export const siteConfig: SiteConfig = {
 };
 
 // Used to generate links in both the Header & Footer.
-export const menuLinks: { path: string; title: string }[] = [
+export const menuLinks: { path: string; title: string; newTab?: boolean }[] = [
 	{
 		path: "/",
 		title: "Home",
@@ -43,6 +43,12 @@ export const menuLinks: { path: string; title: string }[] = [
 	{
 		path: "/about/",
 		title: "About",
+	},
+	{
+		// Served from public/; opens in the browser's built-in PDF viewer.
+		path: "/Manas-Ganti-Resume.pdf",
+		title: "Resume",
+		newTab: true,
 	},
 ];
 
