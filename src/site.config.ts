@@ -9,7 +9,7 @@ export const siteConfig: SiteConfig = {
 	title: "Manas Ganti",
 	author: "Manas Ganti",
 	description:
-		"Research engineer building RL environments, verifiable rewards, and post-training pipelines for language and vision-language models.",
+		"Building RL environments for agents and autonomous robots.",
 	lang: "en-US",
 	ogLocale: "en_US",
 	// Date.prototype.toLocaleDateString() parameters, found in src/utils/date.ts.
