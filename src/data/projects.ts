@@ -6,7 +6,7 @@
  * training run hasn't produced it yet, `result` stays null and `status` says so.
  * An unverified number on this site costs more credibility than an empty slot.
  *
- * Last audited against the project directories on 2026-09-23. Each `result` names
+ * Last audited against the project directories on 2026-09-25. Each `result` names
  * the file it came from in a comment.
  */
 
@@ -195,12 +195,42 @@ export const projects: Project[] = [
 		slug: "payload-transport",
 		title: "Robust Payload-Transport Navigation under Terrain & Dynamics Shift",
 		tagline:
-			"A mobile robot learns to carry a variable-mass payload across parameterised sloped terrain, measured for out-of-distribution generalisation against a classical Nav2 baseline run through the same harness.",
+			"An NVIDIA Carter mobile robot learns to carry a variable-mass payload across parameterised sloped terrain, measured one axis at a time for out-of-distribution generalisation against a classical Nav2 baseline run through the same harness.",
+		status: "training",
+		area: "rl",
+		hook: "The failure this study guards against is a flat curve that reads as robustness. The first evaluation found two. The friction axis was inert: the wheel's own low-friction material won PhysX's min-combine, so the sampled ground friction never reached the tyre. And the slope axis's \"catastrophic\" cliff sat at a grade the robot's wheel torque cannot climb. Both are now caught by physics probes in the smoke test and a torque-derived feasibility check that keeps impossible cells out of the classification. The train/OOD split is asserted at config load, and payload mass replaces gravity randomisation, because an unknown load is a real deployment condition and a different planet is not.",
+		stack: [
+			"Isaac Sim 4.5 / Isaac Lab 2.1",
+			"PPO (rsl_rl)",
+			"PyTorch",
+			"Nav2 baseline",
+			"Weights & Biases",
+			"SLURM (L40S)",
+		],
+		repo: "https://github.com/Manas-Ganti/robotics-rl-payload-transport",
+		// No result: the first eval's numbers live only on ARC (results/ is gitignored) and were
+		// invalidated by the friction and wheel-radius fixes (commits 3eae625, f555417).
+		result: null,
+		post: null,
+		featured: false,
+	},
+	{
+		slug: "drone-maze",
+		title: "Drone Maze Speed-Navigation: Safe Route or Fast Route",
+		tagline:
+			"A vision-based quadrotor policy (Crazyflie, PPO in Isaac Lab) flies hand-built 3D mazes that each offer a slow, safe route and a fast, risky one. The question is whether its route choice shifts toward the fast route as its flying improves, measured rather than eyeballed.",
 		status: "design",
 		area: "rl",
-		hook: "The train/OOD split is asserted at config load, and touching endpoints count as overlap, so a contaminated grid cannot run. Payload mass replaces the usual gravity randomisation, because an unknown load is a real deployment condition and a different planet is not. A config-tree walk rejects any gravity-randomisation key.",
-		stack: ["PyTorch", "Isaac Sim / Isaac Lab", "Nav2 baseline", "Weights & Biases", "Docker"],
-		repo: "https://github.com/Manas-Ganti/robotics-rl-payload-transport",
+		hook: "Speed has to require risk, and a validator proves it: no path that keeps the safe route's clearance may be meaningfully shorter, so the fast route can't just be a worse line. Potential-based shaping gives every trajectory the same return, which leaves route choice to time and crash risk alone, and the reward weights are set against a computed break-even crash probability per maze rather than tuned by feel. Every episode is classified by the route's signature regions, which separates picking the fast route from flying the slow one faster.",
+		stack: [
+			"Isaac Lab",
+			"PPO (rsl_rl) + CNN actor-critic",
+			"PyTorch",
+			"Analytic SDF collision",
+			"SLURM (L40S)",
+		],
+		repo: "https://github.com/Manas-Ganti/maze-navigation-drone",
+		// README.md Status: environment validated offline, not yet trained; results/ holds only maze checks.
 		result: null,
 		post: null,
 		featured: false,

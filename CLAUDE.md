@@ -7,7 +7,7 @@ the stock theme into Manas Ganti's portfolio + blog. Strategy and page structure
 
 **Before touching `src/data/projects.ts` or `/projects`, read [`SITE_UPDATE_BRIEF.md`](SITE_UPDATE_BRIEF.md)**
 — an audit of every project directory as of 2026-09-04, with verified numbers and their sources.
-`projects.ts` was re-synced against the project directories on 2026-09-23 (7 projects after self-play-highwayenv was removed, grouped by
+`projects.ts` was re-synced against the project directories on 2026-09-25 (8 projects: self-play-highwayenv was removed and maze-navigation-drone added, grouped by
 `area`); each `result` carries a comment naming the file its number came from.
 
 ## Commands
