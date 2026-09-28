@@ -6,7 +6,7 @@
  * training run hasn't produced it yet, `result` stays null and `status` says so.
  * An unverified number on this site costs more credibility than an empty slot.
  *
- * Last audited against the project directories on 2026-09-25. Each `result` names
+ * Last audited against the project directories on 2026-09-28. Each `result` names
  * the file it came from in a comment.
  */
 
@@ -187,6 +187,35 @@ export const projects: Project[] = [
 				"Out-of-time AUC 0.671 (WOE scorecard) vs 0.693 (LightGBM) on 283,026 loans from 2015",
 			detail:
 				"Bootstrap 95% CIs don't overlap. The GBM's in-sample AUC of 0.754 overstates its lead, and its per-vintage AUC drops from 0.75 to 0.69 at the first out-of-sample quarter while the scorecard holds at 0.66–0.67. Both score distributions are stable (PSI < 0.01). Adding the lender's own grade raises AUC by 1–2 points and makes calibration and stability worse.",
+		},
+		post: null,
+		featured: false,
+	},
+	{
+		slug: "ppo-vs-grpo-racing",
+		title: "Critic-Free RL under Competitive Distribution Shift",
+		tagline:
+			"PPO and GRPO (group-relative advantages, no critic, ported from LLM post-training) train independently on solo racetrack driving through traffic, then race each other head-to-head on a track neither saw as multi-agent.",
+		status: "training",
+		area: "rl",
+		hook: 'The observation has no feature that tells traffic apart from a rival, and a test enforces it, so at evaluation the opponent is just "an unusually capable traffic car" and the shift is behavioural, not structural. The two algorithms share every module except the advantage estimator and the value loss, get matched hyperparameter-search budgets (the search script refuses to break the match), and the reward is frozen at the first gate. Anything else that differed would be a confound.',
+		stack: [
+			"highway-env",
+			"PettingZoo",
+			"PyTorch (custom PPO + GRPO)",
+			"Stable-Baselines3",
+			"rliable",
+			"Weights & Biases",
+			"SLURM (CPU)",
+		],
+		repo: "https://github.com/Manas-Ganti/self-play-highwayenv",
+		// report/log.md, "Phase 1 pilot #1" and "pilots #2a/#2b" (committed 2026-09-28; W&B
+		// qqdbcyk0, 1t62mcey, zykjm5kt). Environment-validation pilots, not PPO-vs-GRPO results.
+		result: {
+			headline:
+				"Environment validation, gate not yet passed: lap completion 0.00 → 0.48 / 0.72 (two seeds) after diagnosing the observation",
+			detail:
+				"SB3 PPO pilots, 2M steps, 50 eval episodes against a ≥0.90 gate. The first policy learned full throttle, straight ahead, because the kinematics observation carries no road information. A zero-steer script leaves the road at the same point. Switching to the on-road occupancy grid fixed cornering; the remaining failures are collisions (0.30 / 0.26), which the reward had made a rational trade: a 5-point crash cost against roughly 174 points of lap progress. The penalties were raised before the reward is frozen, and pilot #3 is next. No PPO-vs-GRPO comparison has run yet.",
 		},
 		post: null,
 		featured: false,
