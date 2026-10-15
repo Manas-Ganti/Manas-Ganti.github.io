@@ -6,7 +6,7 @@
  * training run hasn't produced it yet, `result` stays null and `status` says so.
  * An unverified number on this site costs more credibility than an empty slot.
  *
- * Last audited against the project directories on 2026-09-28. Each `result` names
+ * Last audited against the project directories on 2026-10-14. Each `result` names
  * the file it came from in a comment.
  */
 
@@ -126,6 +126,60 @@ export const projects: Project[] = [
 		featured: true,
 	},
 	{
+		slug: "bond-duration-allocation",
+		title: "Duration-Aware Bond Allocation, Verified against a DP Optimum",
+		tagline:
+			"An agent shifts a Treasury portfolio between 2y, 7y and 20y buckets as the yield curve moves, under position, turnover and duration limits and transaction costs, in a world simple enough that the optimal policy can be computed exactly.",
+		status: "shipped",
+		area: "rl",
+		hook: "RL for portfolios usually trains on ~500 months of history and reports memorisation as skill. This never trains on history. Fitted Q-iteration learns from sampled transitions only, and is first proven against an exact dynamic-programming optimum (46k states, solved in 0.2 s, grid-converged). Historical FRED curves are sealed in code until every simulation gate passes, and are then used only for evaluation.",
+		stack: [
+			"Fitted Q-iteration",
+			"Dynamic programming",
+			"NumPy",
+			"Ornstein-Uhlenbeck curve model",
+			"FRED data",
+			"pytest",
+		],
+		repo: "https://github.com/Manas-Ganti/bond-duration-allocation",
+		// results/metrics.json (seed 20261014, 2026-10-14), tabulated in README.md.
+		result: {
+			headline:
+				"Learned policy matches the DP optimum: both beat the static allocation by 49.9 bp/yr, paired difference 0.00 (95% CI ±0.51)",
+			detail:
+				"98.4% of long-bucket weights land within one grid step of DP, and both develop the same no-trade band under costs (Jaccard 0.81). On real Treasury curves 1977–2026 the edge is not detectable (+49.8 bp/yr, CI −50 to +154), and fitting the model to history shows why: the policy trades on level mean reversion, and history reverts about half as fast as the training world assumes.",
+		},
+		post: null,
+		featured: false,
+	},
+	{
+		slug: "optimal-stopping",
+		title: "Learned Optimal Stopping for American Options",
+		tagline:
+			"An RL agent decides at each exercise date whether to exercise an American put or hold it, is checked against Longstaff-Schwartz and an exact lattice, then measured on dynamics it never trained on and on 25 years of real prices.",
+		status: "shipped",
+		area: "rl",
+		hook: "Optimal stopping is one of the few finance problems where the right answer is computable, so the policy is proven correct before it is asked anything hard. Five gates were written before any run. Gate C (a no-dividend call must never be exercised early) failed twice: the RBF features decayed to zero at the data edge and could not represent a 0.0012 margin. The fix, pre-registered, was normalised RBFs that extrapolate flat. Real prices stayed sealed until all gates passed.",
+		stack: [
+			"Fitted Q-iteration",
+			"Longstaff-Schwartz",
+			"CRR lattice",
+			"Merton / Heston simulators",
+			"Gymnasium",
+			"pytest",
+		],
+		repo: "https://github.com/Manas-Ganti/optimal-stopping-rl",
+		// results/metrics.json and results/gates.json (seed 20261014, 2026-10-14), tabulated in README.md.
+		result: {
+			headline:
+				"Learned exercise boundary within 0.015 S/K of Longstaff-Schwartz on average (0.024 worst); option values agree to 0.1%",
+			detail:
+				"200,000 common paths; the exact Bermudan lattice shows where each method is wrong. Off-model the two break in opposite places: under Merton jumps the learned policy loses less than half what GBM-fitted LSM loses, under Heston it is the one that degrades. Both regrets stay under 1.5% of option value. On 384 real one-year puts (16 tickers, 2001–2025) they stop on the same date 85% of the time and the pooled difference is indistinguishable from zero.",
+		},
+		post: null,
+		featured: false,
+	},
+	{
 		slug: "clinical-dashboard",
 		title: "Clinical Intelligence Dashboard",
 		tagline:
@@ -168,6 +222,81 @@ export const projects: Project[] = [
 			detail:
 				"55 hand-written questions across six categories, graded on whether the result rows match rather than the SQL text (gpt-oss-120b). Every retrieval miss was a refusal, not a guess. 0 of 110 generated queries failed validation. Vague questions are the weak spot (33%), because the model answers instead of asking.",
 		},
+		post: null,
+		featured: false,
+	},
+	{
+		slug: "mind-the-gap-recsys",
+		title: "Mind the Gap: a Two-Stage Recommender with an Honest Evaluation Protocol",
+		tagline:
+			"A retrieval-plus-ranking news recommender on MIND impression logs, where the deliverable is the evaluation protocol and the models are what gets measured.",
+		status: "shipped",
+		area: "systems",
+		hook: "Recommender papers usually report a random split, sampled negatives and an untuned baseline, and each inflates the result. This scores every method under both split types and both protocols in one pass, with paired negatives. Item-kNN gets a 120-point grid before the two-tower model trains, and a retrieval ceiling separates what retrieval lost from what ranking lost. Rankers are selected on a later day, because a same-day holdout overrated the GBDT.",
+		stack: [
+			"PySpark",
+			"PyTorch (two-tower)",
+			"LightGBM lambdarank",
+			"RP3beta",
+			"FAISS (HNSW / IVF)",
+			"SLURM",
+		],
+		repo: "https://github.com/Manas-Ganti/mind-the-gap-recsys",
+		// results/mind_small/metrics.json + gates.json (ARC job 1133598, seed 42, 2026-10-13).
+		result: {
+			headline:
+				"A random split inflates the two-tower model's NDCG@10 36×; on the temporal split it scores lowest of the four retrievers",
+			detail:
+				"MIND-small, 20,000 eval users, seeds 42–44. Under full-catalog evaluation tuned popularity beats every learned retriever, while sampled negatives rank the two-tower second (retrieval-order Kendall τ = 0.00 between protocols). Retrieval is the bottleneck: candidate recall is 0.43, so retrieval loses more of Recall@10 than ranking does (0.57 vs 0.33). The neural listwise ranker reaches 0.066 NDCG@10 end to end. All four pre-stated gates pass.",
+		},
+		post: null,
+		featured: false,
+	},
+	{
+		slug: "arcode",
+		title: "arcode: a Minimal Coding Agent with an Eval Harness",
+		tagline:
+			"A readable terminal coding agent for any OpenAI-compatible endpoint, built against Virginia Tech ARC's hosted models, that logs every trajectory with a reward so sessions double as evaluation or RL data.",
+		status: "shipped",
+		area: "systems",
+		hook: "The eval harness is built so a pass can't be bought. Grading tests are hidden and overlaid only after the agent stops, test files are restored before grading, and any edit to them is flagged. Every task is checked to fail on its baseline and pass on its reference solution. Context compaction never splits a tool call from its result, the API key never reaches commands the agent runs, and the runtime has zero dependencies.",
+		stack: [
+			"TypeScript",
+			"Node 20",
+			"OpenAI-compatible API",
+			"MCP (stdio)",
+			"GLM / DeepSeek / gpt-oss",
+		],
+		repo: "https://github.com/Manas-Ganti/arcode",
+		// evals/results/m2-baseline/results.jsonl (committed): 3 models × 42 tasks, one sample each.
+		result: {
+			headline:
+				"A 42-task hidden-test eval, run across three models: 38–42 of 42 resolved per model",
+			detail:
+				"34 Aider polyglot exercises (public, possibly memorised) and 8 new hand-written multi-file tasks, one sample per model. The set is near its ceiling, so it does not separate models yet. That finding is why harder tasks, more samples and paired statistics are next.",
+		},
+		post: null,
+		featured: false,
+	},
+	{
+		slug: "ctr-stream",
+		title: "ctr-stream: Ad Click Prediction with Streaming Features",
+		tagline:
+			"A CTR model built on a Spark Structured Streaming feature pipeline and a batch one, to measure the training-serving skew between them and price what it costs, with calibration reported ahead of AUC.",
+		status: "design",
+		area: "systems",
+		hook: "AUC is blind to both failures that break ad systems: probabilities that are 2× too high, and features computed differently in batch and in streaming. The batch and streaming definitions share one interval form, so the parity table climbs from batch to stream one mechanism at a time (freshness, tile alignment, watermark drops) and any unexplained residual is listed. A point-in-time test has a deliberately leaky negative control, and open attribution windows are censored, never counted as non-clicks.",
+		stack: [
+			"Spark Structured Streaming",
+			"LightGBM",
+			"DeepFM",
+			"Hashed LR",
+			"Isotonic / Platt calibration",
+			"pytest",
+		],
+		repo: null,
+		// No result: README.md status (2026-10-12) is code-complete, not yet run on Criteo; results/ is empty.
+		result: null,
 		post: null,
 		featured: false,
 	},

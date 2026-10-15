@@ -7,7 +7,7 @@ the stock theme into Manas Ganti's portfolio + blog. Strategy and page structure
 
 **Before touching `src/data/projects.ts` or `/projects`, read [`SITE_UPDATE_BRIEF.md`](SITE_UPDATE_BRIEF.md)**
 — an audit of every project directory as of 2026-09-04, with verified numbers and their sources.
-`projects.ts` was re-synced against the project directories on 2026-09-25 and updated 2026-09-28 (9 projects: self-play-highwayenv re-added as PPO vs GRPO with its Phase 1 pilot numbers from `report/log.md`, grouped by
+`projects.ts` was re-synced against the project directories on 2026-09-25, updated 2026-09-28, and extended 2026-10-14 to 14 projects (added bond-duration-allocation, optimal-stopping, mind-the-gap-recsys, arcode, and ctr-stream with no result since it is unrun; earlier: self-play-highwayenv re-added as PPO vs GRPO with its Phase 1 pilot numbers from `report/log.md`, grouped by
 `area`); each `result` carries a comment naming the file its number came from.
 
 ## Commands
