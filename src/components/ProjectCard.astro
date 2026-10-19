@@ -9,7 +9,7 @@ interface Props {
 }
 
 const { compact = false, project } = Astro.props;
-const { hook, repo, result, slug, stack, status, tagline, title } = project;
+const { hook, hub, repo, result, slug, stack, status, tagline, title } = project;
 
 const statusClass: Record<Project["status"], string> = {
 	shipped: "border-accent text-accent",
@@ -60,18 +60,51 @@ const statusClass: Record<Project["status"], string> = {
 	}
 
 	{
-		repo ? (
-			<a
-				class="cactus-link mt-4 inline-flex items-center gap-x-1 text-sm"
-				href={repo}
-				rel="noreferrer"
-				target="_blank"
-			>
-				<Icon aria-hidden="true" class="h-4 w-4" focusable="false" name="mdi:github" />
-				View the code
-			</a>
-		) : (
-			<p class="text-muted mt-4 text-xs">Repository not yet public.</p>
+		hub && !compact && (
+			<p class="mt-4">
+				<span class="text-accent-2 font-semibold">On the Prime Intellect Environments Hub: </span>
+				{hub.baseline}
+			</p>
 		)
 	}
+
+	<div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+		{
+			repo ? (
+				<a
+					class="cactus-link inline-flex items-center gap-x-1"
+					href={repo}
+					rel="noreferrer"
+					target="_blank"
+				>
+					<Icon aria-hidden="true" class="h-4 w-4" focusable="false" name="mdi:github" />
+					View the code
+				</a>
+			) : (
+				<p class="text-muted text-xs">Repository not yet public.</p>
+			)
+		}
+		{
+			hub && (
+				<a
+					class="cactus-link inline-flex items-center gap-x-1"
+					href={hub.url}
+					rel="noreferrer"
+					target="_blank"
+				>
+					<Icon aria-hidden="true" class="h-4 w-4" focusable="false" name="mdi:package-variant-closed" />
+					Environments Hub
+				</a>
+			)
+		}
+		{
+			hub &&
+				!compact &&
+				hub.evals.map((ev) => (
+					<a class="cactus-link" href={ev.url} rel="noreferrer" target="_blank">
+						{ev.label}
+					</a>
+				))
+		}
+	</div>
 </article>

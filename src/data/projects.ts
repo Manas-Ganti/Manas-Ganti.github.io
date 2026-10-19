@@ -46,6 +46,16 @@ export interface Project {
 	/** Blog post slug, once the post anchored to this result exists. */
 	post: string | null;
 	featured: boolean;
+	/**
+	 * Published Prime Intellect Environments Hub package, when there is one. `baseline` is a
+	 * public vf-eval run of the Hub package (a separate harness from `result`), and it follows
+	 * the same proof rule.
+	 */
+	hub?: {
+		url: string;
+		baseline: string;
+		evals: { label: string; url: string }[];
+	};
 }
 
 export const projects: Project[] = [
@@ -104,6 +114,18 @@ export const projects: Project[] = [
 		},
 		post: null,
 		featured: true,
+		// prime-hub: environments/dxenv-diagnostician/outputs/evals/*--3656063f (ARC, 2026-10-19).
+		hub: {
+			url: "https://app.primeintellect.ai/dashboard/environments/manasganti/dxenv-diagnostician",
+			baseline:
+				"Published as a verifiers v1 package, with the free-reward exploit found in the pre-release audit fixed. Untrained Qwen2.5-7B scores −0.602 ± 0.015 over 50 episodes, below the −0.019 floor of reporting the prior.",
+			evals: [
+				{
+					label: "Baseline eval",
+					url: "https://app.primeintellect.ai/dashboard/evaluations/bs08z0hgluai2b23g3ait4c5",
+				},
+			],
+		},
 	},
 	{
 		slug: "long-context-navigator",
@@ -124,6 +146,22 @@ export const projects: Project[] = [
 		},
 		post: null,
 		featured: true,
+		// prime-hub: environments/long-context-navigator/outputs/evals/*--3a22cfe7, *--d9e6c9c7 (ARC, 2026-10-19).
+		hub: {
+			url: "https://app.primeintellect.ai/dashboard/environments/manasganti/long-context-navigator",
+			baseline:
+				"Published as a verifiers v1 package that regenerates the source repo's splits exactly. Untrained Qwen2.5-7B answers 0 of 50 correctly in-distribution and 0 of 50 out-of-distribution, breaking the 600-token ceiling in 66% and 90% of episodes.",
+			evals: [
+				{
+					label: "Baseline eval (2–3 hops)",
+					url: "https://app.primeintellect.ai/dashboard/evaluations/zf5z737cx5350oiaf7mmi82z",
+				},
+				{
+					label: "Baseline eval (4–5 hops)",
+					url: "https://app.primeintellect.ai/dashboard/evaluations/cjk9jb3ggyfq47tvyxq39117",
+				},
+			],
+		},
 	},
 	{
 		slug: "bond-duration-allocation",
