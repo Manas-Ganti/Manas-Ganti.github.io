@@ -1,6 +1,13 @@
 ---
 import ProjectCard from "@/components/ProjectCard.astro";
-import { areaLabel, type ProjectArea, projects } from "@/data/projects";
+import {
+	areaBlurb,
+	areaLabel,
+	featuredProjects,
+	type ProjectArea,
+	projects,
+	statusLabel,
+} from "@/data/projects";
 import PageLayout from "@/layouts/Base.astro";
 
 const meta = {
@@ -9,35 +16,111 @@ const meta = {
 	title: "Projects",
 };
 
-const areas: ProjectArea[] = ["rl", "systems"];
+const areas: ProjectArea[] = ["llm-rl", "optimum", "embodied", "systems"];
+
+const statusDot: Record<(typeof projects)[number]["status"], string> = {
+	shipped: "bg-accent",
+	training: "bg-link",
+	design: "bg-muted",
+};
 ---
 
 <PageLayout meta={meta}>
 	<h1 class="title mb-6">Projects</h1>
 
 	<p class="mb-4">
-		Where a number appears, it was measured and you can check it in the repo. Several of these RL
-		projects have been trained and didn't work the way I hoped. Those results are here too, with the
-		reason, because a negative result I can explain is worth more than a positive one I can't.
-		Projects that haven't been trained yet say so and show no number.
+		I build RL environments and ML systems, and most of the work goes into making sure the final
+		number is true. I check the data for shortcuts before training, write pass/fail gates before
+		the run, and compute a ceiling the model shouldn't be able to beat. Every number here is
+		measured and points to the file it came from. Results that went against me stay in, with the
+		reason.
 	</p>
 	<p class="text-muted mb-12 text-xs">
-		What I think is worth reading in each one is the design decision, not the tech stack. Those are
-		under <span class="text-accent-2 font-semibold">The hard part</span>.
+		Four in depth first, then all {projects.length} grouped by what they show. Each card leads with
+		<span class="text-accent-2 font-semibold">What I found</span> and the design decision behind
+		it, under <span class="text-accent-2 font-semibold">Why it's hard</span>.
 	</p>
 
-	{
-		areas.map((area) => (
-			<section class="mb-16">
-				<h2 class="title mb-6 text-xl">{areaLabel[area]}</h2>
-				<div class="space-y-12">
-					{projects
-						.filter((p) => p.area === area)
-						.map((project) => (
-							<ProjectCard project={project} />
-						))}
-				</div>
-			</section>
-		))
-	}
+	<section class="mb-16">
+		<h2 class="title mb-6 text-xl">In depth</h2>
+		<div class="space-y-12">
+			{featuredProjects.map((project) => <ProjectCard project={project} />)}
+		</div>
+	</section>
+
+	<section>
+		<h2 class="title mb-2 text-xl">Everything else</h2>
+		<p class="text-muted mb-8 text-sm">
+			Open a row for the full card.
+			<span class="ms-2 inline-flex flex-wrap items-center gap-x-3">
+				{
+					(["shipped", "training", "design"] as const).map((s) => (
+						<span class="inline-flex items-center gap-x-1 text-xs">
+							<span aria-hidden="true" class:list={["inline-block h-2 w-2 rounded-full", statusDot[s]]} />
+							{statusLabel[s]}
+						</span>
+					))
+				}
+			</span>
+		</p>
+		{
+			areas.map((area) => {
+				const group = projects.filter((p) => p.area === area);
+				return (
+					<div class="mb-12">
+						<h3 class="text-accent-2 text-lg font-semibold">{areaLabel[area]}</h3>
+						<p class="text-muted mb-4 text-sm">{areaBlurb[area]}</p>
+						<ul class="divide-muted/30 border-muted/30 divide-y border-y" role="list">
+							{group.map((p) =>
+								p.featured ? (
+									<li class="py-3">
+										<a class="cactus-link font-semibold" href={`#${p.slug}`}>
+											{p.title}
+										</a>
+										<span class="text-muted ms-2 text-xs">(in depth above)</span>
+										<p class="text-muted mt-1 text-sm">{p.brief}</p>
+									</li>
+								) : (
+									<li>
+										<details class="group py-3" id={p.slug}>
+											<summary class="cursor-pointer list-none">
+												<span class="flex items-baseline gap-x-2">
+													<span
+														aria-label={statusLabel[p.status]}
+														class:list={["inline-block h-2 w-2 shrink-0 rounded-full", statusDot[p.status]]}
+														role="img"
+													/>
+													<span class="font-semibold">{p.title}</span>
+													<span aria-hidden="true" class="text-muted ms-auto text-xs group-open:rotate-90">
+														▸
+													</span>
+												</span>
+												<span class="text-muted mt-1 block ps-4 text-sm">{p.brief}</span>
+											</summary>
+											<div class="ps-4">
+												<ProjectCard nested project={p} />
+											</div>
+										</details>
+									</li>
+								),
+							)}
+						</ul>
+					</div>
+				);
+			})
+		}
+	</section>
+
+	<script>
+		// Rows are collapsed <details>; open the one a link points at (e.g. /projects/#arcode).
+		function openFromHash() {
+			const el = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+			if (el instanceof HTMLDetailsElement) {
+				el.open = true;
+				el.scrollIntoView();
+			}
+		}
+		openFromHash();
+		window.addEventListener("hashchange", openFromHash);
+	</script>
 </PageLayout>

@@ -18,11 +18,24 @@ export const statusLabel: Record<ProjectStatus, string> = {
 	design: "Built; no training run yet",
 };
 
-export type ProjectArea = "rl" | "systems";
+/** Grouped by the skill a project demonstrates, in the order /projects shows them. */
+export type ProjectArea = "llm-rl" | "optimum" | "embodied" | "systems";
 
 export const areaLabel: Record<ProjectArea, string> = {
-	rl: "RL environments & post-training",
-	systems: "Applied ML & LLM systems",
+	"llm-rl": "LLM agents: RL environments & evals",
+	optimum: "RL against a provable optimum",
+	embodied: "Embodied & multi-agent RL",
+	systems: "Production ML & LLM systems",
+};
+
+export const areaBlurb: Record<ProjectArea, string> = {
+	"llm-rl":
+		"Environments where the reward can't be gamed, and harnesses where a pass can't be bought.",
+	optimum:
+		"Finance problems where the right answer is computable, so the learned policy is checked against it.",
+	embodied:
+		"Simulated robots and vehicles, where the first job is proving the simulator measures what it claims.",
+	systems: "Shipped applications and models, where the evaluation protocol is the deliverable.",
 };
 
 export interface Project {
@@ -33,6 +46,11 @@ export interface Project {
 	tagline: string;
 	/** A shorter line for the home page's selected-work list. Featured projects only. */
 	summary?: string;
+	/**
+	 * One line (≤ ~20 words) for the /projects index row: the result, or the honest status when
+	 * there is none. Same proof rule as `result`: only numbers already on this card.
+	 */
+	brief: string;
 	status: ProjectStatus;
 	area: ProjectArea;
 	/** The senior design decision — the reason this project is interesting. */
@@ -65,12 +83,14 @@ export const projects: Project[] = [
 		slug: "visual-reasoning-rlvr",
 		title: "Investigative Visual Reasoning via Verifiable RL",
 		tagline:
-			"An agentic RL environment where a 32B vision-language model investigates an image under an inspection budget (committing a falsifiable hypothesis before each reveal) to decide whether it is a real photo or AI-generated.",
+			"A 32B vision-language agent inspects an image under an inspection budget, committing a falsifiable hypothesis before each reveal, to decide whether it is a real photo or AI-generated. No LLM judge anywhere.",
 		summary:
 			"A 32B vision-language agent inspects an image under a budget to decide whether it is real or AI-generated. The reward is checked mechanically, with no LLM judge.",
 		status: "training",
-		area: "rl",
-		hook: "The reward is mechanically verifiable end to end, with no LLM judge anywhere: it reads only machine-checkable fields (belief, reconciliation direction, verdict, confidence), never the prose. Getting there meant measuring the benchmark first. Image dimensions alone predicted the label at 0.850 AUC, so the fix was a new geometry-matched substrate (1,570 paired images, confound back to 0.500), not a patched metric.",
+		area: "llm-rl",
+		brief:
+			"GRPO built discrimination (gap −3.4% → +15.8%) but held-out accuracy stayed at chance, for a structural reason.",
+		hook: "Before training, I tested the benchmark itself: image dimensions alone predicted the label at 0.850 AUC. Rather than patch the metric, I built a new geometry-matched substrate (1,570 paired images) that brings that shortcut back to 0.500. The reward reads only machine-checkable fields (belief, reconciliation direction, verdict, confidence), never the prose.",
 		stack: [
 			"Qwen2.5-VL-32B",
 			"PyTorch",
@@ -84,7 +104,7 @@ export const projects: Project[] = [
 		// results/grpo_run1.md, results/grpo_run3.md, results/what_we_know.md (committed).
 		result: {
 			headline:
-				"GRPO took the policy from anti-correlated to discriminating (separation gap −3.4% → +15.8% over 600 steps), while held-out accuracy stayed at chance",
+				"GRPO taught the policy to discriminate (separation gap −3.4% → +15.8% over 600 steps), but held-out accuracy stayed at chance, and I traced why",
 			detail:
 				"0.545 vs 0.513 base (McNemar p=0.23). The cause is structural: group-relative advantage cancels across balanced data, so GRPO cannot move a class prior. Three cycles later, trajectory analysis over 988 rollouts found that the verdict matches the belief after one inspection 80.1% of the time. The investigation confirms a first impression instead of testing it, which sets up the next experiment.",
 		},
@@ -95,12 +115,14 @@ export const projects: Project[] = [
 		slug: "dxenv",
 		title: "dxenv: a Diagnostic RLVR Environment",
 		tagline:
-			"A multi-turn RL environment where an LLM agent decides which tests are worth their cost and reports a distribution over 149 conditions. It is a synthetic research environment, not a clinical tool, and none of its outputs are clinical guidance.",
+			"An LLM agent decides which diagnostic tests are worth their cost, then reports a distribution over 149 conditions. A synthetic research environment, not a clinical tool; none of its outputs are clinical guidance.",
 		summary:
 			"An LLM agent decides which diagnostic tests are worth their cost. A Bayes-optimal ceiling flags any run that beats it as a leak. Published on the Prime Intellect Environments Hub.",
 		status: "training",
-		area: "rl",
-		hook: "The environment computes a Bayes-optimal ceiling over the same evidence the agent sees, so an agent that beats it must have information it shouldn't, and training halts on a suspected leak. That is one of twelve invariants, each with its own test file. Test ordering can never earn positive reward, scoring uses a strictly proper rule so hedging can't pay, and the eval split is hash-frozen.",
+		area: "llm-rl",
+		brief:
+			"Test ordering rose from 0.79 to 3.5 per episode with no reward for testing; the policy is still below the floor.",
+		hook: "The environment computes a Bayes-optimal ceiling from the same evidence the agent sees. An agent that beats it must have information it shouldn't, so training halts on a suspected leak. That is one of twelve invariants, each with its own test file: ordering tests can never earn positive reward, a strictly proper scoring rule means hedging can't pay, and the eval split is hash-frozen.",
 		stack: [
 			"Qwen2.5-7B + LoRA",
 			"GRPO",
@@ -114,7 +136,7 @@ export const projects: Project[] = [
 		// README.md Status + docs/design-notes.md; curve at runs/grpo/steps.jsonl (committed).
 		result: {
 			headline:
-				"99 GRPO steps took test ordering from 0.79 to 3.5 per episode, with no reward term for testing",
+				"With no reward for testing, 99 GRPO steps raised test ordering from 0.79 to 3.5 per episode: the policy learned that tests can pay for themselves",
 			detail:
 				"Tests only ever subtract reward (invariant I5), so the only route was for tests to pay for themselves. The environment result is real. The policy is still poor: it sits below the blank-record floor, and the curve is a fast correction followed by a plateau. Gate B was measured three times (prompted: fail; SFT: pass; GRPO: fail) and each verdict is reported.",
 		},
@@ -137,12 +159,13 @@ export const projects: Project[] = [
 		slug: "long-context-navigator",
 		title: "Long-Context Navigation under a Hard Context Ceiling",
 		tagline:
-			"A verifiable RL environment where an agent answers multi-hop questions over documents far larger than the 600 tokens it may hold. It chooses what to read, compress, and drop, and exceeding the ceiling ends the episode.",
+			"An agent answers multi-hop questions over documents far larger than the 600 tokens it may hold, choosing what to read, compress and drop. Exceeding the ceiling ends the episode.",
 		summary:
 			"An agent answers multi-hop questions over documents far larger than the 600 tokens it may hold. SFT reaches 0.630 in-distribution and collapses to 0.050 at longer hop counts.",
 		status: "training",
-		area: "rl",
-		hook: "The ceiling is a constraint, not a cost term, so there is no α to tune until the intended behaviour appears. The policy is stateless between steps, which means its own COMPRESS summary is the only way to carry a bridge entity forward. Every instance is validated from the text and rejected if any distractor path reaches the answer. A real-text substrate (MuSiQue) was built, de-confounded five times, then rejected by a gate set before the numbers were seen.",
+		area: "llm-rl",
+		brief: "SFT reaches 0.630 in-distribution and collapses to 0.050 at longer hop counts.",
+		hook: "The ceiling is a hard constraint, not a cost term, so there is no penalty weight to tune until the right behaviour appears. The policy keeps no memory between steps: its own COMPRESS summary is the only way to carry a bridge entity forward. Every instance is rejected if a distractor path reaches the answer, and a real-text substrate (MuSiQue) was rejected by a gate set before its numbers were seen.",
 		stack: ["Qwen2.5-7B-Instruct", "SFT + GRPO (LoRA)", "PyTorch", "Pydantic", "SLURM"],
 		repo: "https://github.com/Manas-Ganti/long-context-navigator",
 		// README.md "Results so far": 600 held-out instances, commands listed alongside.
@@ -177,7 +200,9 @@ export const projects: Project[] = [
 		tagline:
 			"An agent shifts a Treasury portfolio between 2y, 7y and 20y buckets as the yield curve moves, under position, turnover and duration limits and transaction costs, in a world simple enough that the optimal policy can be computed exactly.",
 		status: "shipped",
-		area: "rl",
+		area: "optimum",
+		brief:
+			"The learned policy matches the exact DP optimum (paired difference 0.00 bp/yr); on real curves the edge is not detectable.",
 		hook: "RL for portfolios usually trains on ~500 months of history and reports memorisation as skill. This never trains on history. Fitted Q-iteration learns from sampled transitions only, and is first proven against an exact dynamic-programming optimum (46k states, solved in 0.2 s, grid-converged). Historical FRED curves are sealed in code until every simulation gate passes, and are then used only for evaluation.",
 		stack: [
 			"Fitted Q-iteration",
@@ -204,7 +229,9 @@ export const projects: Project[] = [
 		tagline:
 			"An RL agent decides at each exercise date whether to exercise an American put or hold it, is checked against Longstaff-Schwartz and an exact lattice, then measured on dynamics it never trained on and on 25 years of real prices.",
 		status: "shipped",
-		area: "rl",
+		area: "optimum",
+		brief:
+			"Learned exercise boundary within 0.015 S/K of Longstaff-Schwartz; option values agree to 0.1%.",
 		hook: "Optimal stopping is one of the few finance problems where the right answer is computable, so the policy is proven correct before it is asked anything hard. Five gates were written before any run. Gate C (a no-dividend call must never be exercised early) failed twice: the RBF features decayed to zero at the data edge and could not represent a 0.0012 margin. The fix, pre-registered, was normalised RBFs that extrapolate flat. Real prices stayed sealed until all gates passed.",
 		stack: [
 			"Fitted Q-iteration",
@@ -229,12 +256,13 @@ export const projects: Project[] = [
 		slug: "clinical-dashboard",
 		title: "Clinical Intelligence Dashboard",
 		tagline:
-			"A full-stack clinical data platform where an LLM answers natural-language questions without ever writing SQL, running on 1,171 Synthea patients (53k encounters, 150k findings).",
+			"Plain-English clinical questions over 1,171 Synthea patients (53k encounters, 150k findings). The LLM works only through typed tools and never writes SQL.",
 		summary:
 			"An LLM answers clinical questions only through typed service tools, never generated SQL, with a 35-case eval harness that grades every tool call.",
 		status: "shipped",
 		area: "systems",
-		hook: 'The LLM operates the system only through typed service tools: constrained function calling against a Pydantic domain model, never freeform text or generated SQL. In a regulated domain, the type system is the safety boundary. The same tool surface runs on Claude or on self-hosted open models, which turns "can we swap in a cheaper model?" into a measurable question.',
+		brief: "A 35-case eval harness that grades every LLM tool call mechanically.",
+		hook: 'In a regulated domain, the type system is the safety boundary. The LLM can only call typed service tools against a Pydantic domain model; it never emits freeform queries or generated SQL. The same tool layer runs on Claude or on self-hosted open models, which turns "can we swap in a cheaper model?" into a measurable question.',
 		stack: [
 			"FastAPI",
 			"Pydantic v2",
@@ -260,6 +288,8 @@ export const projects: Project[] = [
 			"Ask a database a question in plain English, read the SQL before anything runs, then get the answer, with every number in the explanation checked against the returned rows.",
 		status: "shipped",
 		area: "systems",
+		brief:
+			"95% execution accuracy with the full schema; 85% with retrieved tables at 29% fewer tokens.",
 		hook: "The model's SQL is treated as untrusted input. It is parsed into a syntax tree and checked (one SELECT only, every table and column exists, restricted columns blocked) before it touches a database that is opened read-only anyway. The server re-validates on Run because the browser could have changed the query. Retrieval, validation, execution and the number check are plain local code, testable without an API key.",
 		stack: ["Python", "sqlglot", "Pydantic", "gpt-oss-120b / Claude", "Schema retrieval"],
 		repo: "https://github.com/Manas-Ganti/NL-SQL-agent",
@@ -280,6 +310,8 @@ export const projects: Project[] = [
 			"A retrieval-plus-ranking news recommender on MIND impression logs, where the deliverable is the evaluation protocol and the models are what gets measured.",
 		status: "shipped",
 		area: "systems",
+		brief:
+			"A random split inflates the two-tower model's NDCG@10 36×; on a temporal split it ranks last of four.",
 		hook: "Recommender papers usually report a random split, sampled negatives and an untuned baseline, and each inflates the result. This scores every method under both split types and both protocols in one pass, with paired negatives. Item-kNN gets a 120-point grid before the two-tower model trains, and a retrieval ceiling separates what retrieval lost from what ranking lost. Rankers are selected on a later day, because a same-day holdout overrated the GBDT.",
 		stack: [
 			"PySpark",
@@ -306,7 +338,9 @@ export const projects: Project[] = [
 		tagline:
 			"A readable terminal coding agent for any OpenAI-compatible endpoint, built against Virginia Tech ARC's hosted models, that logs every trajectory with a reward so sessions double as evaluation or RL data.",
 		status: "shipped",
-		area: "systems",
+		area: "llm-rl",
+		brief:
+			"38–42 of 42 hidden-test tasks resolved per model. The set is near its ceiling, so harder tasks are next.",
 		hook: "The eval harness is built so a pass can't be bought. Grading tests are hidden and overlaid only after the agent stops, test files are restored before grading, and any edit to them is flagged. Every task is checked to fail on its baseline and pass on its reference solution. Context compaction never splits a tool call from its result, the API key never reaches commands the agent runs, and the runtime has zero dependencies.",
 		stack: [
 			"TypeScript",
@@ -333,6 +367,7 @@ export const projects: Project[] = [
 			"A CTR model built on a Spark Structured Streaming feature pipeline and a batch one, to measure the training-serving skew between them and price what it costs, with calibration reported ahead of AUC.",
 		status: "design",
 		area: "systems",
+		brief: "Code-complete; not yet run on Criteo.",
 		hook: "AUC is blind to both failures that break ad systems: probabilities that are 2× too high, and features computed differently in batch and in streaming. The batch and streaming definitions share one interval form, so the parity table climbs from batch to stream one mechanism at a time (freshness, tile alignment, watermark drops) and any unexplained residual is listed. A point-in-time test has a deliberately leaky negative control, and open attribution windows are censored, never counted as non-clicks.",
 		stack: [
 			"Spark Structured Streaming",
@@ -355,6 +390,8 @@ export const projects: Project[] = [
 			"A probability-of-default model on Lending Club loans where the validation framework (calibration, stability, fairness, explainability, leakage) is the deliverable.",
 		status: "shipped",
 		area: "systems",
+		brief:
+			"Out-of-time AUC 0.671 (scorecard) vs 0.693 (LightGBM) on 283,026 loans; both under-predict defaults by ~10%.",
 		hook: "Every one of the 151 raw columns is classified by when it becomes known, and an unclassified column raises, so a data refresh can't silently add a feature. The out-of-time split does the rest of the work. A random split looks almost perfectly calibrated (ECE 0.002). Out of time, both models under-predict defaults by about 10% relative, and that is the problem that matters for a PD used in pricing.",
 		stack: ["scikit-learn", "LightGBM", "SHAP", "WOE scorecard", "statsmodels", "Pandas"],
 		repo: "https://github.com/Manas-Ganti/credit-risk-model",
@@ -374,7 +411,9 @@ export const projects: Project[] = [
 		tagline:
 			"PPO and GRPO (group-relative advantages, no critic, ported from LLM post-training) train independently on solo racetrack driving through traffic, then race each other head-to-head on a track neither saw as multi-agent.",
 		status: "training",
-		area: "rl",
+		area: "embodied",
+		brief:
+			"Environment validation: lap completion 0.00 → 0.48 / 0.72 after fixing the observation. Gate not yet passed.",
 		hook: 'The observation has no feature that tells traffic apart from a rival, and a test enforces it, so at evaluation the opponent is just "an unusually capable traffic car" and the shift is behavioural, not structural. The two algorithms share every module except the advantage estimator and the value loss, get matched hyperparameter-search budgets (the search script refuses to break the match), and the reward is frozen at the first gate. Anything else that differed would be a confound.',
 		stack: [
 			"highway-env",
@@ -403,7 +442,9 @@ export const projects: Project[] = [
 		tagline:
 			"An NVIDIA Carter mobile robot learns to carry a variable-mass payload across parameterised sloped terrain, measured one axis at a time for out-of-distribution generalisation against a classical Nav2 baseline run through the same harness.",
 		status: "training",
-		area: "rl",
+		area: "embodied",
+		brief:
+			"The first evaluation exposed two physics bugs, now fixed and guarded by probes. No valid result yet.",
 		hook: "The failure this study guards against is a flat curve that reads as robustness. The first evaluation found two. The friction axis was inert: the wheel's own low-friction material won PhysX's min-combine, so the sampled ground friction never reached the tyre. And the slope axis's \"catastrophic\" cliff sat at a grade the robot's wheel torque cannot climb. Both are now caught by physics probes in the smoke test and a torque-derived feasibility check that keeps impossible cells out of the classification. The train/OOD split is asserted at config load, and payload mass replaces gravity randomisation, because an unknown load is a real deployment condition and a different planet is not.",
 		stack: [
 			"Isaac Sim 4.5 / Isaac Lab 2.1",
@@ -426,7 +467,8 @@ export const projects: Project[] = [
 		tagline:
 			"A vision-based quadrotor policy (Crazyflie, PPO in Isaac Lab) flies hand-built 3D mazes that each offer a slow, safe route and a fast, risky one. The question is whether its route choice shifts toward the fast route as its flying improves, measured rather than eyeballed.",
 		status: "design",
-		area: "rl",
+		area: "embodied",
+		brief: "Environment and maze validator built and checked offline; not yet trained.",
 		hook: "Speed has to require risk, and a validator proves it: no path that keeps the safe route's clearance may be meaningfully shorter, so the fast route can't just be a worse line. Potential-based shaping gives every trajectory the same return, which leaves route choice to time and crash risk alone, and the reward weights are set against a computed break-even crash probability per maze rather than tuned by feel. Every episode is classified by the route's signature regions, which separates picking the fast route from flying the slow one faster.",
 		stack: [
 			"Isaac Lab",

@@ -6,9 +6,11 @@ interface Props {
 	project: Project;
 	/** Compact form for the home page: no stack list, no result detail. */
 	compact?: boolean;
+	/** Rendered inside a /projects index row that already shows the title and owns the anchor. */
+	nested?: boolean;
 }
 
-const { compact = false, project } = Astro.props;
+const { compact = false, nested = false, project } = Astro.props;
 const { hook, hub, repo, result, slug, stack, status, tagline, title } = project;
 
 const statusClass: Record<Project["status"], string> = {
@@ -18,9 +20,12 @@ const statusClass: Record<Project["status"], string> = {
 };
 ---
 
-<article class="border-muted/30 border-t pt-6" id={slug}>
+<article
+	class:list={[nested ? "pt-3 pb-2" : "border-muted/30 border-t pt-6"]}
+	id={nested ? undefined : slug}
+>
 	<div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-		<h3 class="text-accent-2 text-lg font-semibold">{title}</h3>
+		{!nested && <h3 class="text-accent-2 text-lg font-semibold">{title}</h3>}
 		<span
 			class:list={["rounded-full border px-2 py-0.5 text-xs font-semibold", statusClass[status]]}
 		>
@@ -33,6 +38,7 @@ const statusClass: Record<Project["status"], string> = {
 	{
 		result ? (
 			<p class="border-accent mt-4 border-s-2 ps-3">
+				<span class="text-accent-2 block text-xs font-semibold tracking-wide uppercase">What I found</span>
 				<strong class="text-accent-2">{result.headline}</strong>
 				{!compact && <span class="text-muted block sm:inline"> — {result.detail}</span>}
 			</p>
@@ -47,7 +53,7 @@ const statusClass: Record<Project["status"], string> = {
 		!compact && (
 			<>
 				<p class="mt-4">
-					<span class="text-accent-2 font-semibold">The hard part: </span>
+					<span class="text-accent-2 font-semibold">Why it's hard: </span>
 					{hook}
 				</p>
 				<ul class="text-muted mt-4 flex flex-wrap gap-x-2 gap-y-1 text-xs" role="list">
