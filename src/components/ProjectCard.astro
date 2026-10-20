@@ -33,44 +33,43 @@ const statusClass: Record<Project["status"], string> = {
 		</span>
 	</div>
 
-	<p class="mt-2">{tagline}</p>
+	<section class="mt-4">
+		<h4 class="text-accent-2 text-xs font-semibold tracking-wide uppercase">Approach</h4>
+		<p class="mt-1">{tagline}</p>
+		{!compact && <p class="mt-2">{hook}</p>}
+	</section>
 
-	{
-		result ? (
-			<p class="border-accent mt-4 border-s-2 ps-3">
-				<span class="text-accent-2 block text-xs font-semibold tracking-wide uppercase">What I found</span>
-				<strong class="text-accent-2">{result.headline}</strong>
-				{!compact && <span class="text-muted block sm:inline"> — {result.detail}</span>}
-			</p>
-		) : (
-			<p class="text-muted mt-4 text-xs italic">
-				No published result yet. Numbers appear here when a run produces them.
-			</p>
-		)
-	}
+	<section class="border-accent mt-4 border-s-2 ps-3">
+		<h4 class="text-accent-2 text-xs font-semibold tracking-wide uppercase">What I found</h4>
+		{
+			result ? (
+				<p class="mt-1">
+					<strong class="text-accent-2">{result.headline}</strong>
+					{!compact && <span class="text-muted block sm:inline"> — {result.detail}</span>}
+				</p>
+			) : (
+				<p class="text-muted mt-1 text-xs italic">
+					No published result yet. Numbers appear here when a run produces them.
+				</p>
+			)
+		}
+		{
+			hub && !compact && (
+				<p class="mt-2">
+					<span class="text-accent-2 font-semibold">On the Prime Intellect Environments Hub: </span>
+					{hub.baseline}
+				</p>
+			)
+		}
+	</section>
 
 	{
 		!compact && (
-			<>
-				<p class="mt-4">
-					<span class="text-accent-2 font-semibold">Why it's hard: </span>
-					{hook}
-				</p>
-				<ul class="text-muted mt-4 flex flex-wrap gap-x-2 gap-y-1 text-xs" role="list">
-					{stack.map((tech) => (
-						<li class="bg-muted/10 rounded px-2 py-0.5">{tech}</li>
-					))}
-				</ul>
-			</>
-		)
-	}
-
-	{
-		hub && !compact && (
-			<p class="mt-4">
-				<span class="text-accent-2 font-semibold">On the Prime Intellect Environments Hub: </span>
-				{hub.baseline}
-			</p>
+			<ul class="text-muted mt-4 flex flex-wrap gap-x-2 gap-y-1 text-xs" role="list">
+				{stack.map((tech) => (
+					<li class="bg-muted/10 rounded px-2 py-0.5">{tech}</li>
+				))}
+			</ul>
 		)
 	}
 
