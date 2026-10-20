@@ -1,13 +1,6 @@
 ---
 import ProjectCard from "@/components/ProjectCard.astro";
-import {
-	areaBlurb,
-	areaLabel,
-	featuredProjects,
-	type ProjectArea,
-	projects,
-	statusLabel,
-} from "@/data/projects";
+import { areaBlurb, areaLabel, type ProjectArea, projects, statusLabel } from "@/data/projects";
 import PageLayout from "@/layouts/Base.astro";
 
 const meta = {
@@ -36,20 +29,12 @@ const statusDot: Record<(typeof projects)[number]["status"], string> = {
 		reason.
 	</p>
 	<p class="text-muted mb-12 text-xs">
-		Four in depth first, then all {projects.length} grouped by what they show. Each card leads with
+		All {projects.length}, grouped by what they show, with the four I'd start with already open. Each card leads with
 		<span class="text-accent-2 font-semibold">What I found</span> and the design decision behind
 		it, under <span class="text-accent-2 font-semibold">Why it's hard</span>.
 	</p>
 
-	<section class="mb-16">
-		<h2 class="title mb-6 text-xl">In depth</h2>
-		<div class="space-y-12">
-			{featuredProjects.map((project) => <ProjectCard project={project} />)}
-		</div>
-	</section>
-
 	<section>
-		<h2 class="title mb-2 text-xl">Everything else</h2>
 		<p class="text-muted mb-8 text-sm">
 			Open a row for the full card.
 			<span class="ms-2 inline-flex flex-wrap items-center gap-x-3">
@@ -71,39 +56,29 @@ const statusDot: Record<(typeof projects)[number]["status"], string> = {
 						<h3 class="text-accent-2 text-lg font-semibold">{areaLabel[area]}</h3>
 						<p class="text-muted mb-4 text-sm">{areaBlurb[area]}</p>
 						<ul class="divide-muted/30 border-muted/30 divide-y border-y" role="list">
-							{group.map((p) =>
-								p.featured ? (
-									<li class="py-3">
-										<a class="cactus-link font-semibold" href={`#${p.slug}`}>
-											{p.title}
-										</a>
-										<span class="text-muted ms-2 text-xs">(in depth above)</span>
-										<p class="text-muted mt-1 text-sm">{p.brief}</p>
-									</li>
-								) : (
-									<li>
-										<details class="group py-3" id={p.slug}>
-											<summary class="cursor-pointer list-none">
-												<span class="flex items-baseline gap-x-2">
-													<span
-														aria-label={statusLabel[p.status]}
-														class:list={["inline-block h-2 w-2 shrink-0 rounded-full", statusDot[p.status]]}
-														role="img"
-													/>
-													<span class="font-semibold">{p.title}</span>
-													<span aria-hidden="true" class="text-muted ms-auto text-xs group-open:rotate-90">
-														▸
-													</span>
+							{group.map((p) => (
+								<li>
+									<details class="group py-3" id={p.slug} open={p.featured}>
+										<summary class="cursor-pointer list-none">
+											<span class="flex items-baseline gap-x-2">
+												<span
+													aria-label={statusLabel[p.status]}
+													class:list={["inline-block h-2 w-2 shrink-0 rounded-full", statusDot[p.status]]}
+													role="img"
+												/>
+												<span class="font-semibold">{p.title}</span>
+												<span aria-hidden="true" class="text-muted ms-auto text-xs group-open:rotate-90">
+													▸
 												</span>
-												<span class="text-muted mt-1 block ps-4 text-sm">{p.brief}</span>
-											</summary>
-											<div class="ps-4">
-												<ProjectCard nested project={p} />
-											</div>
-										</details>
-									</li>
-								),
-							)}
+											</span>
+											<span class="text-muted mt-1 block ps-4 text-sm">{p.brief}</span>
+										</summary>
+										<div class="ps-4">
+											<ProjectCard nested project={p} />
+										</div>
+									</details>
+								</li>
+							))}
 						</ul>
 					</div>
 				);
