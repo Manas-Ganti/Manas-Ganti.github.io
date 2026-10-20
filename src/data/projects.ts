@@ -31,6 +31,8 @@ export interface Project {
 	title: string;
 	/** One line: what it is. No adjectives. */
 	tagline: string;
+	/** A shorter line for the home page's selected-work list. Featured projects only. */
+	summary?: string;
 	status: ProjectStatus;
 	area: ProjectArea;
 	/** The senior design decision — the reason this project is interesting. */
@@ -64,6 +66,8 @@ export const projects: Project[] = [
 		title: "Investigative Visual Reasoning via Verifiable RL",
 		tagline:
 			"An agentic RL environment where a 32B vision-language model investigates an image under an inspection budget (committing a falsifiable hypothesis before each reveal) to decide whether it is a real photo or AI-generated.",
+		summary:
+			"A 32B vision-language agent inspects an image under a budget to decide whether it is real or AI-generated. The reward is checked mechanically, with no LLM judge.",
 		status: "training",
 		area: "rl",
 		hook: "The reward is mechanically verifiable end to end, with no LLM judge anywhere: it reads only machine-checkable fields (belief, reconciliation direction, verdict, confidence), never the prose. Getting there meant measuring the benchmark first. Image dimensions alone predicted the label at 0.850 AUC, so the fix was a new geometry-matched substrate (1,570 paired images, confound back to 0.500), not a patched metric.",
@@ -92,6 +96,8 @@ export const projects: Project[] = [
 		title: "dxenv: a Diagnostic RLVR Environment",
 		tagline:
 			"A multi-turn RL environment where an LLM agent decides which tests are worth their cost and reports a distribution over 149 conditions. It is a synthetic research environment, not a clinical tool, and none of its outputs are clinical guidance.",
+		summary:
+			"An LLM agent decides which diagnostic tests are worth their cost. A Bayes-optimal ceiling flags any run that beats it as a leak. Published on the Prime Intellect Environments Hub.",
 		status: "training",
 		area: "rl",
 		hook: "The environment computes a Bayes-optimal ceiling over the same evidence the agent sees, so an agent that beats it must have information it shouldn't, and training halts on a suspected leak. That is one of twelve invariants, each with its own test file. Test ordering can never earn positive reward, scoring uses a strictly proper rule so hedging can't pay, and the eval split is hash-frozen.",
@@ -132,6 +138,8 @@ export const projects: Project[] = [
 		title: "Long-Context Navigation under a Hard Context Ceiling",
 		tagline:
 			"A verifiable RL environment where an agent answers multi-hop questions over documents far larger than the 600 tokens it may hold. It chooses what to read, compress, and drop, and exceeding the ceiling ends the episode.",
+		summary:
+			"An agent answers multi-hop questions over documents far larger than the 600 tokens it may hold. SFT reaches 0.630 in-distribution and collapses to 0.050 at longer hop counts.",
 		status: "training",
 		area: "rl",
 		hook: "The ceiling is a constraint, not a cost term, so there is no α to tune until the intended behaviour appears. The policy is stateless between steps, which means its own COMPRESS summary is the only way to carry a bridge entity forward. Every instance is validated from the text and rejected if any distractor path reaches the answer. A real-text substrate (MuSiQue) was built, de-confounded five times, then rejected by a gate set before the numbers were seen.",
@@ -222,6 +230,8 @@ export const projects: Project[] = [
 		title: "Clinical Intelligence Dashboard",
 		tagline:
 			"A full-stack clinical data platform where an LLM answers natural-language questions without ever writing SQL, running on 1,171 Synthea patients (53k encounters, 150k findings).",
+		summary:
+			"An LLM answers clinical questions only through typed service tools, never generated SQL, with a 35-case eval harness that grades every tool call.",
 		status: "shipped",
 		area: "systems",
 		hook: 'The LLM operates the system only through typed service tools: constrained function calling against a Pydantic domain model, never freeform text or generated SQL. In a regulated domain, the type system is the safety boundary. The same tool surface runs on Claude or on self-hosted open models, which turns "can we swap in a cheaper model?" into a measurable question.',

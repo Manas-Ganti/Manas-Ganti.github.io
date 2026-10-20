@@ -1,5 +1,6 @@
 ---
 import SocialList from "@/components/SocialList.astro";
+import { featuredProjects, projects } from "@/data/projects";
 import PageLayout from "@/layouts/Base.astro";
 ---
 
@@ -7,30 +8,35 @@ import PageLayout from "@/layouts/Base.astro";
 	<section>
 		<h1 class="title mb-6">Manas Ganti</h1>
 		<p class="mb-4">
-			Hey there! I'm Manas Ganti, and this is my personal portfolio page. Whether you're a possible
-			recruiter (hire me, please!) or just curious about my work, you'll find all my projects here.
-			I'm a current student at Virginia Tech, pursuing my master's degree in Computer Engineering
-			and will graduate by May 2027. I am particularly interested in curating Reinforcement Learning
-			environments for agents and post-training for language and vision-language models across
-			various domains; whether it be in robotics, healthcare, or autonomous systems.
+			I build reinforcement learning environments for LLM and vision-language agents across
+			domains: medical diagnosis, image forensics, and long-document reasoning. I also build the
+			evals that grade them and the AI engineering around them, from a coding-agent test harness to
+			tool-calling LLM applications.
 		</p>
-		<p class="mb-4">
-			Most of the work is in measuring things before trusting them. That means leak-checking
-			benchmarks until surface features score at chance, computing an optimal ceiling that tells me
-			when a policy is cheating, and gating every expensive run behind a cheap check. When a
-			training run doesn't move the metric, I write down why. Several of my{" "}
-			<a class="cactus-link" href="/projects/">projects</a> are exactly that. I keep tinkering with ideas
-			and exploring new ways to improve and validate my work and also hyper fixate on niche topics that
-			excite me.
-		</p>
-		<p class="mb-4">
-			Before this, I spent a few years working at Inmed AI where I worked on developing and
-			deploying image segmentation pipelines for neuroimaging modalities particularly with Brain
-			MRIs and CT scans. We developed products for radiologists working on diagnosing and analyzing
-			patients with neurodegenerative conditions. My next venture was Assert AI, a surveillance
-			analytics firm where I developed and deployed computer vision models on the edge for real-time
-			surveillance and analytics.
+		<p class="mb-6">
+			I'm doing my M.S. in Computer Engineering at Virginia Tech (graduating May 2027). Before that,
+			I spent two and a half years shipping computer vision models into clinical imaging and edge
+			deployments. <a class="cactus-link" href="/about/">More about me</a>.
 		</p>
 		<SocialList />
+	</section>
+
+	<section class="mt-16">
+		<h2 class="title mb-6 text-xl">Selected work</h2>
+		<ul class="space-y-6" role="list">
+			{
+				featuredProjects.map((p) => (
+					<li>
+						<a class="cactus-link font-semibold" href={`/projects/#${p.slug}`}>
+							{p.title}
+						</a>
+						<p class="mt-1">{p.summary ?? p.tagline}</p>
+					</li>
+				))
+			}
+		</ul>
+		<p class="mt-8">
+			<a class="cactus-link" href="/projects/">All {projects.length} projects →</a>
+		</p>
 	</section>
 </PageLayout>
